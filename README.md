@@ -1,6 +1,7 @@
----
 
 # LeaveLink Backend Server
+
+
 
 This repository contains the source code for the backend server of the [LeaveLink](https://leavelink.thewired.agency) leave management system for universities. Built with [NestJS](https://nestjs.com/), [PostgreSQL]() [TypeScript](https://www.typescriptlang.org/), the server provides a RESTful API for managing staff leave requests and approvals.
 
