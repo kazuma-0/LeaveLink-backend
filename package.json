@@ -1,10 +1,10 @@
 {
-  "name": "leave-automation-backend",
-  "version": "0.0.1",
+  "name": "leavelink",
+  "version": "0.0.2",
   "description": "",
-  "author": "",
-  "private": true,
-  "license": "UNLICENSED",
+  "author": "kazuma-0",
+  "private": false,
+  "license": "GNU3",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
