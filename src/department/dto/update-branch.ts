@@ -13,16 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { CreateBranchDto } from './create-branch.dto';
+import { PartialType } from '@nestjs/mapped-types';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
-  app.enableVersioning();
-  app.useGlobalPipes(new ValidationPipe());
-  app.enableCors({ origin: '*' });
-  await app.listen(3001);
-}
-bootstrap();
+export class UpdateBranchDto extends PartialType(CreateBranchDto) {}

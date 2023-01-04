@@ -13,16 +13,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { Test, TestingModule } from '@nestjs/testing';
+import { ApprovalController } from './approval.controller';
+import { ApprovalService } from './approval.service';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
-  app.enableVersioning();
-  app.useGlobalPipes(new ValidationPipe());
-  app.enableCors({ origin: '*' });
-  await app.listen(3001);
-}
-bootstrap();
+describe('ApprovalController', () => {
+  let controller: ApprovalController;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [ApprovalController],
+      providers: [ApprovalService],
+    }).compile();
+
+    controller = module.get<ApprovalController>(ApprovalController);
+  });
+
+  it('should be defined', () => {
+    expect(controller).toBeDefined();
+  });
+});

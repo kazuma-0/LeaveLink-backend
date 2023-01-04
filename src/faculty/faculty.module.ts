@@ -13,16 +13,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Module } from '@nestjs/common';
+import { FacultyService } from './faculty.service';
+import { FacultyController } from './faculty.controller';
+import { Faculty } from './entities/faculty.entity';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
-  app.enableVersioning();
-  app.useGlobalPipes(new ValidationPipe());
-  app.enableCors({ origin: '*' });
-  await app.listen(3001);
-}
-bootstrap();
+@Module({
+  imports: [TypeOrmModule.forFeature([Faculty])],
+  controllers: [FacultyController],
+  providers: [FacultyService],
+  exports: [FacultyService],
+})
+export class FacultyModule {}

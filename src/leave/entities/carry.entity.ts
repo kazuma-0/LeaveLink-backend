@@ -13,16 +13,29 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { User } from '../../user/entities/user.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
-  app.enableVersioning();
-  app.useGlobalPipes(new ValidationPipe());
-  app.enableCors({ origin: '*' });
-  await app.listen(3001);
+@Entity()
+export class Carry {
+  @PrimaryGeneratedColumn('increment')
+  id: number;
+
+  @OneToOne(() => User)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
+
+  @Column()
+  user_id: string;
+
+  @Column({
+    default: 3,
+  })
+  days: number;
 }
-bootstrap();

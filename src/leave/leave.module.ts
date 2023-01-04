@@ -13,16 +13,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { CarryService } from './carry.service';
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Carry } from './entities/carry.entity';
+import { Leave } from './entities/leave.entity';
+import { LeaveController } from './leave.controller';
+import { LeaveService } from './leave.service';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
-  app.enableVersioning();
-  app.useGlobalPipes(new ValidationPipe());
-  app.enableCors({ origin: '*' });
-  await app.listen(3001);
-}
-bootstrap();
+@Module({
+  imports: [TypeOrmModule.forFeature([Leave, Carry])],
+  controllers: [LeaveController],
+  providers: [LeaveService, CarryService],
+  exports: [LeaveService, CarryService],
+})
+export class LeaveModule {}

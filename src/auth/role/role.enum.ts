@@ -13,16 +13,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
-  app.enableVersioning();
-  app.useGlobalPipes(new ValidationPipe());
-  app.enableCors({ origin: '*' });
-  await app.listen(3001);
+/**
+ * A list of the possible roles that a user can have.
+ */
+export enum Role {
+  REGISTRAR = 'REGISTRAR',
+  RESIDENT_DIRECTOR = 'RESIDENT_DIRECTOR',
+  DEAN = 'DEAN',
+  HEAD_OF_DEPARTMENT = 'HEAD_OF_DEPARTMENT',
+  STAFF = 'STAFF',
+  STUDENT = 'STUDENT',
 }
-bootstrap();

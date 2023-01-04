@@ -13,16 +13,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
-  app.enableVersioning();
-  app.useGlobalPipes(new ValidationPipe());
-  app.enableCors({ origin: '*' });
-  await app.listen(3001);
+export enum LeaveType {
+  CASUAL = 'CASUAL',
+  PERMISSION = 'PERMISSION',
+  ON_DUTY = 'ON_DUTY',
+  COMPENSATION = 'COMPENSATION',
 }
-bootstrap();
+
+export enum LeaveSession {
+  FORENOON = 'FORENOON',
+  AFTERNOON = 'AFTERNOON',
+  FULLDAY = 'FULLDAY',
+}
+
+export enum ApprovalStatus {
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+  NOT_CHECKED = 'NOT_CHECKED',
+  NO_PRIVILEGE = 'NO_PRIVILEGE',
+  PENDING = 'PENDING',
+}

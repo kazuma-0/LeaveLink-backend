@@ -13,16 +13,34 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { User } from './../../user/entities/user.entity';
+import { Department } from './department.entity';
+@Entity()
+export default class Branch {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
-  app.enableVersioning();
-  app.useGlobalPipes(new ValidationPipe());
-  app.enableCors({ origin: '*' });
-  await app.listen(3001);
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
+  @Column({ unique: true })
+  name: string;
+
+  @ManyToOne(() => Department, (department) => department.branches)
+  @JoinColumn({})
+  department: Department;
+
+  @Column()
+  departmentId: number;
+
+  @OneToMany(() => User, (user) => user.user_id)
+  users: User[];
 }
-bootstrap();

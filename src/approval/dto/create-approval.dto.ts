@@ -13,16 +13,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
-  app.enableVersioning();
-  app.useGlobalPipes(new ValidationPipe());
-  app.enableCors({ origin: '*' });
-  await app.listen(3001);
+import { IsBoolean, IsDateString, IsEnum, IsString } from 'class-validator';
+import { LeaveSession, LeaveType } from './../../leave.constants';
+export class CreateApprovalDto {
+  @IsString()
+  reason: string;
+  @IsDateString()
+  startDate: Date;
+  @IsDateString()
+  endDate: Date;
+  @IsBoolean()
+  isHalfDay: boolean;
+  @IsEnum(LeaveSession)
+  leaveSession: LeaveSession;
+  @IsEnum(LeaveType)
+  leaveType: LeaveType;
 }
-bootstrap();

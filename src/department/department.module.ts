@@ -13,16 +13,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { BranchController } from './branch.controller';
+import { BranchService } from './branch.service';
+import { DepartmentController } from './department.controller';
+import { DepartmentService } from './department.service';
+import Branch from './entities/branch.entity';
+import { Department } from './entities/department.entity';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
-  app.enableVersioning();
-  app.useGlobalPipes(new ValidationPipe());
-  app.enableCors({ origin: '*' });
-  await app.listen(3001);
-}
-bootstrap();
+@Module({
+  imports: [TypeOrmModule.forFeature([Department, Branch])],
+  controllers: [DepartmentController, BranchController],
+  providers: [DepartmentService, BranchService],
+  exports: [DepartmentService, BranchService],
+})
+export class DepartmentModule {}
