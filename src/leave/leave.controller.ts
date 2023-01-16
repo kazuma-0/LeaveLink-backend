@@ -14,6 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Controller, Delete, Get, Param, Query } from '@nestjs/common';
+import { query } from 'express';
 import { LeaveService } from './leave.service';
 
 /**
@@ -33,10 +34,10 @@ export class LeaveController {
     return this.leaveService.findAll(query);
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   // return this.leaveService.findOne(+id);
-  // }
+  @Get(':id')
+  findOne(@Query() query) {
+    return this.leaveService.findOne(query);
+  }
 
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateLeaveDto: UpdateLeaveDto) {

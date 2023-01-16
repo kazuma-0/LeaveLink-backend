@@ -1,3 +1,4 @@
+import { OneToMany } from 'typeorm';
 // Copyright (c) 2023 Anuj S and The Wired
 //
 // This program is free software: you can redistribute it and/or modify
@@ -21,6 +22,7 @@ import {
   Entity,
   ManyToOne,
   JoinColumn,
+  ManyToMany,
 } from 'typeorm';
 import { ApprovalStatus, LeaveSession, LeaveType } from '../../leave.constants';
 
@@ -59,7 +61,7 @@ export class Approval {
     enum: ApprovalStatus,
     default: ApprovalStatus.NOT_CHECKED,
   })
-  isReigistrarApproved: ApprovalStatus;
+  isRegistrarApproved: ApprovalStatus;
 
   @Column({
     type: 'enum',
@@ -98,10 +100,15 @@ export class Approval {
   // not to be stored in the database
   date: string;
 
-  @ManyToOne(() => Leave, (leave: Leave) => leave.approvals, { nullable: true })
-  @JoinColumn({ name: 'leaveId' })
-  leave: Leave;
+  // @ManyToOne(() => Leave, (leave: Leave) => leave.approvals, {
+  //   nullable: true,
+  //   cascade: true,
+  //   onDelete: 'CASCADE',
+  //   onUpdate: 'CASCADE',
+  // })
+  // // @JoinColumn({ name: 'leaveId' })
+  // leave: Leave;
 
-  @Column({ nullable: true })
-  leaveId: string;
+  // @Column({ nullable: true })
+  // leaveId: string;
 }

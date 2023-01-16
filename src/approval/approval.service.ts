@@ -86,10 +86,10 @@ export class ApprovalService {
         approvalStatues['isDeanApproved'] = ApprovalStatus.NO_PRIVILEGE;
         approvalStatues['isResidentDirectorApproved'] =
           ApprovalStatus.NO_PRIVILEGE;
-        approvalStatues['isReigistrarApproved'] = ApprovalStatus.PENDING;
+        approvalStatues['isRegistrarApproved'] = ApprovalStatus.PENDING;
         break;
       case Role.STUDENT:
-        approvalStatues['isReigistrarApproved'] = ApprovalStatus.NO_PRIVILEGE;
+        approvalStatues['isRegistrarApproved'] = ApprovalStatus.NO_PRIVILEGE;
         approvalStatues['isResidentDirectorApproved'] =
           ApprovalStatus.NO_PRIVILEGE;
         approvalStatues['isDeanApproved'] = ApprovalStatus.NO_PRIVILEGE;
@@ -126,7 +126,7 @@ export class ApprovalService {
     }
     delete updatedOptions.date;
     const data = await this.approvalRepository.find({
-      relations: ['user', 'user.department', 'user.branch'],
+      relations: ['user', 'user.department', 'user.branch', 'user.faculty'],
       relationLoadStrategy: 'join',
       where: updatedOptions,
     });
@@ -170,12 +170,16 @@ export class ApprovalService {
     requestUser: User;
   }) {
     // Fetch the approval from the database
-    const approval = await this.approvalRepository.findOneBy({ id });
+    const approval = await this.approvalRepository.findOne({
+      where: { id },
+      relations: ['user', 'user.department', 'user.faculty'],
+    });
     if (!approval) {
       // Return a 404 Not Found error if the approval does not exist
       throw new NotFoundException('Approval request does not exist');
     }
     const user = await this.userService.findOne(requestUser.user_id);
+    console.log(user);
     const updatedApprovalDto: UpdateApprovalDto = {};
     if (approval.isApproved || approval.isRejected) {
       throw new BadRequestException(
@@ -187,15 +191,15 @@ export class ApprovalService {
       case Role.REGISTRAR:
         if (
           (approval.isResidentDirectorApproved === ApprovalStatus.APPROVED ||
-            approval.isReigistrarApproved === ApprovalStatus.NO_PRIVILEGE) &&
-          updateApprovalDto.isReigistrarApproved === ApprovalStatus.APPROVED
+            approval.isRegistrarApproved === ApprovalStatus.NO_PRIVILEGE) &&
+          updateApprovalDto.isRegistrarApproved === ApprovalStatus.APPROVED
         ) {
-          updatedApprovalDto.isReigistrarApproved = ApprovalStatus.APPROVED;
+          updatedApprovalDto.isRegistrarApproved = ApprovalStatus.APPROVED;
           updatedApprovalDto.isApproved = true;
         } else if (
-          updateApprovalDto.isReigistrarApproved === ApprovalStatus.REJECTED
+          updateApprovalDto.isRegistrarApproved === ApprovalStatus.REJECTED
         ) {
-          updatedApprovalDto.isReigistrarApproved = ApprovalStatus.REJECTED;
+          updatedApprovalDto.isRegistrarApproved = ApprovalStatus.REJECTED;
           updatedApprovalDto.isRejected = true;
         }
         break;
@@ -208,7 +212,7 @@ export class ApprovalService {
         ) {
           updatedApprovalDto.isResidentDirectorApproved =
             ApprovalStatus.APPROVED;
-          updatedApprovalDto.isReigistrarApproved = ApprovalStatus.PENDING;
+          updatedApprovalDto.isRegistrarApproved = ApprovalStatus.PENDING;
         } else if (
           updateApprovalDto.isResidentDirectorApproved ===
           ApprovalStatus.REJECTED
@@ -222,7 +226,8 @@ export class ApprovalService {
         if (
           (approval.isHodApproved === ApprovalStatus.APPROVED ||
             approval.isHodApproved === ApprovalStatus.NO_PRIVILEGE) &&
-          updateApprovalDto.isDeanApproved === ApprovalStatus.APPROVED
+          updateApprovalDto.isDeanApproved === ApprovalStatus.APPROVED &&
+          user.facultyId === approval.user.facultyId
         ) {
           updatedApprovalDto.isDeanApproved = ApprovalStatus.APPROVED;
           updatedApprovalDto.isResidentDirectorApproved =
@@ -237,9 +242,12 @@ export class ApprovalService {
       case Role.HEAD_OF_DEPARTMENT:
         if (
           approval.user.role === Role.STAFF &&
-          updateApprovalDto.isHodApproved === ApprovalStatus.APPROVED
+          updateApprovalDto.isHodApproved === ApprovalStatus.APPROVED &&
+          user.facultyId === approval.user.facultyId &&
+          user.departmentId === approval.user.departmentId
         ) {
           updatedApprovalDto.isHodApproved = ApprovalStatus.APPROVED;
+          updatedApprovalDto.isDeanApproved = ApprovalStatus.PENDING;
         }
         break;
     }
@@ -248,7 +256,10 @@ export class ApprovalService {
       return null;
     }
     console.log(updatedApprovalDto);
-    this.leaveService.update({ ...approval, ...updatedApprovalDto });
+    updateApprovalDto.leaveId = this.leaveService.update({
+      ...approval,
+      ...updatedApprovalDto,
+    })[0];
     return await this.approvalRepository.update(id, updatedApprovalDto);
   }
 
@@ -259,8 +270,9 @@ export class ApprovalService {
   // TODO: REMOVE testing code
   async test() {
     const t = await this.approvalRepository.findOneBy({
-      id: 'ffe37291-15c3-440c-97f6-8f718282716e',
+      id: 'f19784ae-8426-47c3-9289-c735177de1da',
     });
+    console.log('Approval', t);
     return await this.leaveService.update(t);
   }
 }

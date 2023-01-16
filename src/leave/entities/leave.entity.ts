@@ -18,6 +18,7 @@ import {
   Column,
   Entity,
   JoinColumn,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -46,10 +47,8 @@ export class Leave {
   @Column()
   user_id: string;
 
-  @OneToMany(() => Approval, (approval: Approval) => approval.leave, {
-    nullable: true,
-  })
-  approvals: Approval[];
+  @Column({ type: 'text', default: [], array: true })
+  approvals: string[];
 
   @Column({ default: 0 })
   casualLeaves: number;

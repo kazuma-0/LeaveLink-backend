@@ -13,7 +13,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { IsBoolean, IsDateString, IsEnum, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsDateString,
+  IsEnum,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { LeaveSession, LeaveType } from './../../leave.constants';
 export class CreateApprovalDto {
   @IsString()
@@ -22,10 +28,13 @@ export class CreateApprovalDto {
   startDate: Date;
   @IsDateString()
   endDate: Date;
-  @IsBoolean()
-  isHalfDay: boolean;
+  // @IsBoolean()
+  // isHalfDay: boolean;
   @IsEnum(LeaveSession)
   leaveSession: LeaveSession;
   @IsEnum(LeaveType)
   leaveType: LeaveType;
+  @IsOptional()
+  @IsString()
+  leaveId: string;
 }

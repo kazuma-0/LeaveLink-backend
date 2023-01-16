@@ -21,7 +21,7 @@ import { CreateApprovalDto } from './create-approval.dto';
 export class UpdateApprovalDto extends PartialType(CreateApprovalDto) {
   @IsOptional()
   @IsEnum(ApprovalStatus)
-  isReigistrarApproved?: ApprovalStatus;
+  isRegistrarApproved?: ApprovalStatus;
   @IsOptional()
   @IsEnum(ApprovalStatus)
   isResidentDirectorApproved?: ApprovalStatus;

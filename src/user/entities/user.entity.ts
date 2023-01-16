@@ -35,7 +35,7 @@ export class User {
   user_id: string;
   @Column({})
   date_of_birth: string;
-  // @Column({ nullable: true })
+
   @Column({ select: false })
   password: string;
 

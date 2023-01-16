@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 // Copyright (c) 2023 Anuj S and The Wired
 //
 // This program is free software: you can redistribute it and/or modify
@@ -28,7 +29,11 @@ export class BranchService {
   ) {}
 
   async create(createBranchDto: CreateBranchDto): Promise<any> {
-    return await this.branchRepository.save(createBranchDto);
+    try {
+      return await this.branchRepository.save(createBranchDto);
+    } catch (e) {
+      throw new BadRequestException('Branch already exists');
+    }
   }
 
   async findAll(): Promise<Branch[]> {

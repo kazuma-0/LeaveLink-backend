@@ -27,7 +27,11 @@ export class DepartmentService {
     private readonly departmentRepository: Repository<Department>,
   ) {}
   async create(createDepartmentDto: CreateDepartmentDto) {
-    return await this.departmentRepository.save(createDepartmentDto);
+    try {
+      return await this.departmentRepository.save(createDepartmentDto);
+    } catch (e) {
+      throw new NotFoundException('Department already exists');
+    }
   }
 
   async findAll() {

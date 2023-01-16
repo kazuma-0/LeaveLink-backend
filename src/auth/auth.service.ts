@@ -15,6 +15,7 @@
 
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { User } from '@ngneat/falso/lib/user';
 import * as bcrypt from 'bcrypt';
 import { UserService } from './../user/user.service';
 import { LoginDto } from './dto/login.dto';
@@ -25,15 +26,24 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
+  /**
+   * Validates the user and returns the user if the user is valid.
+   * @param {LoginDto} loginDto - the login dto containing the user id and password
+   */
   async validateUser(loginDto: LoginDto) {
     const user = await this.userService.findOneWithIdPassword(loginDto.user_id);
     if (user && (await bcrypt.compare(loginDto.password, user.password))) {
       delete user.password;
-      return user;
+      const { password, ...result } = user;
+      return result;
     }
     return null;
   }
 
+  /**
+   * Takes in a LoginDto and validates the user.
+   * @param {LoginDto} loginDto - the login dto to validate
+   */
   async login(loginDto: LoginDto) {
     const user = await this.validateUser(loginDto);
     if (!user) throw new BadRequestException('invalid credentails');
@@ -42,6 +52,7 @@ export class AuthService {
     });
     return {
       access_token: token,
+      user,
     };
   }
 }

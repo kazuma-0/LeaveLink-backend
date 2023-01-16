@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 // Copyright (c) 2023 Anuj S and The Wired
 //
 // This program is free software: you can redistribute it and/or modify
@@ -27,7 +28,11 @@ export class FacultyService {
     private readonly facultyRepository: Repository<Faculty>,
   ) {}
   create(createFacultyDto: CreateFacultyDto): Promise<Faculty> {
-    return this.facultyRepository.save(createFacultyDto);
+    try {
+      return this.facultyRepository.save(createFacultyDto);
+    } catch (e) {
+      throw new BadRequestException('Faculty already exists');
+    }
   }
 
   async findAll(): Promise<Faculty[]> {

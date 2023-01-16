@@ -67,7 +67,7 @@ export class LeaveService {
   async findAll(options: FindOptionsWhere<Leave>) {
     return await this.leaveRepository.find({
       where: options,
-      relations: ['user', 'user.branch', 'approvals'],
+      relations: ['user', 'user.branch'],
       relationLoadStrategy: 'join',
     });
   }
@@ -77,8 +77,8 @@ export class LeaveService {
    * @param {string} id - the id of the leave request to find
    * @returns {Promise<LeaveRequest>}
    */
-  async findOne(id: string) {
-    return await this.leaveRepository.findOneBy({ id });
+  async findOne(options: FindOptionsWhere<Leave>) {
+    return await this.leaveRepository.findOne({ where: options });
   }
 
   /**
@@ -100,8 +100,7 @@ export class LeaveService {
    * @returns None
    */
   async update(approval: Approval) {
-    console.log(approval);
-    const { isApproved, startDate, endDate, user_id, leaveType } = approval;
+    const { id, isApproved, startDate, endDate, user_id, leaveType } = approval;
     if (!isApproved) {
       return;
     }
@@ -133,7 +132,6 @@ export class LeaveService {
           year: startDate.getFullYear(),
           user_id: user_id,
         },
-        relations: ['approvals', 'user'],
       });
       const nextMonth = await this.leaveRepository.findOne({
         where: {
@@ -141,8 +139,13 @@ export class LeaveService {
           year: endDate.getFullYear(),
           user_id: user_id,
         },
-        relations: ['approvals'],
       });
+      if (
+        prevMonth.approvals.includes(id) &&
+        nextMonth.approvals.includes(id)
+      ) {
+        throw new BadRequestException('Approval already accepted');
+      }
       switch (leaveType) {
         case LeaveType.CASUAL:
           prevMonth.casualLeaves += startDays;
@@ -161,17 +164,24 @@ export class LeaveService {
           nextMonth.compensationLeaves += endDays;
           break;
       }
-      return [prevMonth, nextMonth];
+      prevMonth.approvals.push(approval.id);
+      nextMonth.approvals.push(approval.id);
+      this.leaveRepository.update(prevMonth.id, prevMonth);
+      this.leaveRepository.update(nextMonth.id, nextMonth);
+      return [prevMonth.id, nextMonth.id];
     } else {
       const days = endDay - startDay + 1;
+      console.log(days);
       const leave = await this.leaveRepository.findOne({
         where: {
           year: startDate.getFullYear(),
           month: startMonth,
           user_id: user_id,
         },
-        relations: ['user', 'approvals'],
       });
+      if (leave.approvals.includes(id)) {
+        throw new BadRequestException('Approval already accepted');
+      }
       switch (leaveType) {
         case LeaveType.CASUAL:
           leave.casualLeaves += days;
@@ -186,7 +196,10 @@ export class LeaveService {
           leave.compensationLeaves += days;
           break;
       }
-      return [leave];
+      leave.approvals.push(approval.id);
+      console.log(leave);
+      this.leaveRepository.update(leave.id, leave);
+      return [leave.id];
     }
   }
 
