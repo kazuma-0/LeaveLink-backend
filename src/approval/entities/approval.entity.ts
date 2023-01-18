@@ -100,15 +100,6 @@ export class Approval {
   // not to be stored in the database
   date: string;
 
-  // @ManyToOne(() => Leave, (leave: Leave) => leave.approvals, {
-  //   nullable: true,
-  //   cascade: true,
-  //   onDelete: 'CASCADE',
-  //   onUpdate: 'CASCADE',
-  // })
-  // // @JoinColumn({ name: 'leaveId' })
-  // leave: Leave;
-
-  // @Column({ nullable: true })
-  // leaveId: string;
+  @Column({ nullable: true })
+  file: string;
 }
