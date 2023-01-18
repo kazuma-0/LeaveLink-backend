@@ -34,6 +34,10 @@ import { RolesGuard } from 'src/auth/role/role.guard';
 import { ApprovalService } from './approval.service';
 import { CreateApprovalDto } from './dto/create-approval.dto';
 import { UpdateApprovalDto } from './dto/update-approval.dto';
+import { UploadedFile, UseInterceptors } from '@nestjs/common/decorators';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { randomUUID } from 'crypto';
 
 @Controller({
   version: '1',
@@ -47,9 +51,30 @@ export class ApprovalController {
    * @param createApprovalDto DTO containing the required data for creating a new approval record
    */
   @Post()
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: 'uploads',
+        filename: (req, file, cb) => {
+          cb(
+            null,
+            file.originalname.split('.')[0] + '-' + randomUUID() + '.pdf',
+          ); // generating a random uuid for the file
+        },
+      }),
+    }),
+  )
   @UseGuards(JwtAuthGuard)
-  create(@Body() createApprovalDto: CreateApprovalDto, @Req() request) {
-    return this.approvalService.create(createApprovalDto, request.user);
+  create(
+    @Body() createApprovalDto: CreateApprovalDto,
+    @UploadedFile() file: Express.Multer.File,
+    @Req() request,
+  ) {
+    let extended = { ...createApprovalDto };
+    if (file) {
+      extended = { ...createApprovalDto, file: file.filename };
+    }
+    return this.approvalService.create(extended, request.user);
   }
 
   /**

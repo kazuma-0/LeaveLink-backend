@@ -18,6 +18,7 @@ import {
   IsDateString,
   IsEnum,
   IsOptional,
+  isString,
   IsString,
 } from 'class-validator';
 import { LeaveSession, LeaveType } from './../../leave.constants';
@@ -37,4 +38,8 @@ export class CreateApprovalDto {
   @IsOptional()
   @IsString()
   leaveId: string;
+
+  @IsOptional()
+  @IsString()
+  file: string;
 }
