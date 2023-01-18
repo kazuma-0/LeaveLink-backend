@@ -15,7 +15,9 @@
 
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ApprovalModule } from './approval/approval.module';
@@ -24,6 +26,7 @@ import { DepartmentModule } from './department/department.module';
 import { FacultyModule } from './faculty/faculty.module';
 import { LeaveModule } from './leave/leave.module';
 import { UserModule } from './user/user.module';
+console.log(join(__dirname, '../..', 'uploads'));
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -44,6 +47,9 @@ import { UserModule } from './user/user.module';
     DepartmentModule,
     LeaveModule,
     ApprovalModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '../..', 'uploads'),
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
